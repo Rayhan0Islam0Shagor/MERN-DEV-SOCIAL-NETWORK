@@ -1,8 +1,8 @@
 const express = require('express');
 const morgan = require('morgan');
 const dotenv = require('dotenv');
-// const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const passport = require('passport');
 
 // config dotenv
 dotenv.config({ path: './config/config.env' });
@@ -15,6 +15,9 @@ const posts = require('./routes/api/posts');
 // configure app
 const app = express();
 app.use(morgan('dev'));
+
+// use this alternate body parser for parsing application/json
+app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 // DB config
@@ -30,10 +33,11 @@ mongoose
   .then(() => console.log('mongoDB connected'))
   .catch((e) => console.log(e));
 
-// initial route
-app.get('/', (req, res) => {
-  res.send('Hello World!');
-});
+// passport middleware
+app.use(passport.initialize());
+
+// passport Config
+require('./config/passport')(passport);
 
 // use routes
 app.use('/api/users', users);
